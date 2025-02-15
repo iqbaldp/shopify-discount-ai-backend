@@ -33,7 +33,7 @@ const promptHandler: RequestHandler = async (req, res) => {
       return;
     }
 
-    const discountRules = await DiscountService.getDiscountRecommendations(cart, promotionPrompt.prompt);
+    const discountRules = await DiscountService.getDiscountRecommendations(cart, promotionPrompt.prompt, promotionPrompt.title);
     res.json(discountRules);
 
   } catch (error) {

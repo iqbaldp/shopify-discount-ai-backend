@@ -7,8 +7,10 @@ export class DiscountService {
 
   public static async getDiscountRecommendations(
     cart: CartData,
-    discountPrompt: string
+    discountPrompt: string,
+    title: string
   ): Promise<DiscountRecommendation> {
+    console.log('discountPrompt ', discountPrompt);
     const completion = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || 'gpt-4',
       messages: [
@@ -18,7 +20,7 @@ export class DiscountService {
         },
         {
           role: "user",
-          content: JSON.stringify({ cart, discountPrompt })
+          content: JSON.stringify({ cart, discountPrompt, title })
         }
       ],
       temperature: parseFloat(process.env.OPENAI_TEMPERATURE || '0.4'),
