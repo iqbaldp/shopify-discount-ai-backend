@@ -2,22 +2,21 @@ import 'dotenv/config';
 import express, { Request, Response, RequestHandler } from 'express';
 import cors from 'cors';
 import { DiscountService } from './services/discountService';
-import { connectDB } from './config/mongodb';
+
 import { PromotionDiscountPrompt } from './models/promotionDiscountPrompt';
+import promotionDiscountPromptRoutes from './routes/promotionDiscountPromptRoutes';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB
-connectDB();
+
 
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'ok' });
 });
 
-// AI prompt endpoint
 const promptHandler: RequestHandler = async (req, res) => {
   try {
     const { cart } = req.body;
@@ -27,10 +26,7 @@ const promptHandler: RequestHandler = async (req, res) => {
       return;
     }
 
-    // Fetch the first promotion discount prompt from MongoDB
-    const promotionPrompt = await PromotionDiscountPrompt.findOne()
-      .sort({ priority: -1, createdAt: -1 })
-      .exec();
+    const promotionPrompt = await PromotionDiscountPrompt.findOne();
 
     if (!promotionPrompt) {
       res.status(404).json({ error: 'No discount prompt found' });
@@ -47,6 +43,8 @@ const promptHandler: RequestHandler = async (req, res) => {
 };
 
 app.post('/api/prompt', promptHandler);
+
+app.use('/api/promotion-discount-prompts', promotionDiscountPromptRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
